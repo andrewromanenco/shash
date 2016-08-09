@@ -53,3 +53,12 @@ func TestNewSHMustCreateSaltInDao(t *testing.T) {
 		t.Error("Salt must be sent to DAO")
 	}
 }
+
+func TestNewSHMustFailIfSaltAlreadyExists(t *testing.T) {
+	dao := newMockDao()
+	dao.m["_salt_key_74469_"] = []byte("salt-value")
+	_, err := NewSecuredHash("password", dao)
+	if err == nil {
+		t.Error("Must fail when salt value exists")
+	}
+}

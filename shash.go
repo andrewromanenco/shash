@@ -24,6 +24,14 @@ func NewSecuredHash(password string, dao Dao) (*SHash, error) {
 	if dao == nil {
 		return nil, errors.New("No DAO is provided")
 	}
+	existingSalt, err := dao.Get([]byte(saltKey))
+	if err != nil {
+		return nil, err
+	}
+	if existingSalt != nil {
+		return nil, errors.New(
+			"The data already exist. Use open with valid password")
+	}
 	key, salt, err := keyHash(password)
 	if err != nil {
 		return nil, err
