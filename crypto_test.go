@@ -81,3 +81,13 @@ func TestEncryptSameDataTwiceMustReturnNonEqualResults(t *testing.T) {
 		t.Error("Decryption of #2 did not produce original data")
 	}
 }
+
+func TestEncryptSameDataHasDifferentLengthWhenCodedTwice(t *testing.T) {
+	key := []byte("12345678901234567890123456789012")
+	data := []byte("test-data")
+	encrypted1, _ := encrypt(key, data)
+	encrypted2, _ := encrypt(key, data)
+	if len(encrypted1) == len(encrypted2) {
+		t.Error("Length should be different")
+	}
+}
