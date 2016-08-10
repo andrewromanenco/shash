@@ -9,26 +9,8 @@ const (
 	value = "value"
 )
 
-type mockDao struct {
-	m map[string][]byte
-}
-
-func (md *mockDao) Put(key, value []byte) error {
-	md.m[string(key)] = value
-	return nil
-}
-
-func (md *mockDao) Get(key []byte) ([]byte, error) {
-	return md.m[string(key)], nil
-}
-
-func (md *mockDao) Delete(key []byte) error {
-	delete(md.m, string(key))
-	return nil
-}
-
-func newMockDao() *mockDao {
-	return &mockDao{make(map[string][]byte)}
+func newMockDao() *InMemDao {
+	return NewInMemDao()
 }
 
 func TestNewSHFailsIfPasswordEmpty(t *testing.T) {
@@ -68,7 +50,7 @@ func TestNewSHMustFailIfSaltAlreadyExists(t *testing.T) {
 	}
 }
 
-func initTestee() (*mockDao, *SHash) {
+func initTestee() (*InMemDao, *SHash) {
 	dao := newMockDao()
 	testee, _ := NewSecuredHash("password", dao)
 	testee.Put([]byte(key), []byte(value))
