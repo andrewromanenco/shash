@@ -106,3 +106,13 @@ func TestGetNonExistingValue(t *testing.T) {
 		t.Error("Nil must be returned for non existing key")
 	}
 }
+
+func TestPutOverridesOldValue(t *testing.T) {
+	_, testee := initTestee()
+	otherValue := "other-value"
+	testee.Put([]byte(key), []byte(otherValue))
+	result, _ := testee.Get([]byte(key))
+	if string(result) != otherValue {
+		t.Error("Get did not return last value")
+	}
+}
