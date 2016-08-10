@@ -116,3 +116,19 @@ func TestPutOverridesOldValue(t *testing.T) {
 		t.Error("Get did not return last value")
 	}
 }
+
+func TestDeleteWorks(t *testing.T) {
+	dao, testee := initTestee()
+	testee.Delete([]byte(key))
+	if dao.m[key] != nil {
+		t.Error("Delete must remove key/value from dao")
+	}
+}
+
+func TestDeleteDoesNotFailOnNonExistingKey(t *testing.T) {
+	_, testee := initTestee()
+	err := testee.Delete([]byte(key))
+	if err != nil {
+		t.Error("Delete must not return error")
+	}
+}

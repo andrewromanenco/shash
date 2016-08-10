@@ -63,3 +63,8 @@ func (sh *SHash) Get(key []byte) ([]byte, error) {
 	}
 	return decrypt(sh.key, encrypted)
 }
+
+// Delete removes key/value. Password is not checked for this step.
+func (sh *SHash) Delete(key []byte) error {
+	return sh.dao.Delete(key)
+}
