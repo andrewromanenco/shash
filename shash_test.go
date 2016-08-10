@@ -4,6 +4,11 @@ import (
 	"testing"
 )
 
+const (
+	key   = "key"
+	value = "value"
+)
+
 type mockDao struct {
 	m map[string][]byte
 }
@@ -60,5 +65,44 @@ func TestNewSHMustFailIfSaltAlreadyExists(t *testing.T) {
 	_, err := NewSecuredHash("password", dao)
 	if err == nil {
 		t.Error("Must fail when salt value exists")
+	}
+}
+
+func initTestee() (*mockDao, *SHash) {
+	dao := newMockDao()
+	testee, _ := NewSecuredHash("password", dao)
+	testee.Put([]byte(key), []byte(value))
+	return dao, testee
+}
+
+func TestPut(t *testing.T) {
+	dao, _ := initTestee()
+	if dao.m[key] == nil {
+		t.Error("Data was not sent to dao")
+	}
+	if string(dao.m[key]) == value {
+		t.Error("Value was not encrypted before saving")
+	}
+}
+
+func TestGetExistingValue(t *testing.T) {
+	_, testee := initTestee()
+	result, err := testee.Get([]byte(key))
+	if err != nil {
+		t.Error("Get should not retutn an error")
+	}
+	if string(result) != value {
+		t.Error("Get did not return same value")
+	}
+}
+
+func TestGetNonExistingValue(t *testing.T) {
+	_, testee := initTestee()
+	result, err := testee.Get([]byte("no-such-key"))
+	if err != nil {
+		t.Error("Get should not retutn an error")
+	}
+	if result != nil {
+		t.Error("Nil must be returned for non existing key")
 	}
 }

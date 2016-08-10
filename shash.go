@@ -42,3 +42,24 @@ func NewSecuredHash(password string, dao Dao) (*SHash, error) {
 	}
 	return &SHash{dao, key}, nil
 }
+
+// Put encrypts value and sends it to dao with the key.
+func (sh *SHash) Put(key, value []byte) error {
+	encrypted, err := encrypt(sh.key, value)
+	if err != nil {
+		return err
+	}
+	return sh.dao.Put(key, encrypted)
+}
+
+// Get return decrypted value for a key. Nil if no data exists.
+func (sh *SHash) Get(key []byte) ([]byte, error) {
+	encrypted, err := sh.dao.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	if encrypted == nil {
+		return nil, nil
+	}
+	return decrypt(sh.key, encrypted)
+}
