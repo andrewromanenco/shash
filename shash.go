@@ -21,7 +21,9 @@ AES 256 is used for values encryption/decryption.
 
 ### Encryption process
 
- - get input bytes and calculate CRC32 (4 bytes checksum)
+ - generate random block of random size, up to 256 bytes
+ - prepend size and random block to the input
+ - calculate CRC32 (4 bytes checksum) for the input
  - append CRC32 to the input
  - encrypt input with provided key
 
@@ -32,7 +34,9 @@ AES 256 is used for values encryption/decryption.
  - get output and cut off last 4
  - calculate CRC32 for the output
  - compare calculated CRC32 with bytes cutted on the second step
- - fail if CRC does not match, or return output
+ - fail if CRC does not match
+ - read first byte as size and then cut off first size + 1 bytes from the output
+ - return the output
 
 
 ## Hash operations and encryption
