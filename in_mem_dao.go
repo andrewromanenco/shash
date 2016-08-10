@@ -1,6 +1,6 @@
 package shash
 
-// NewInMemDao return dao implementation based on standard map.
+// NewInMemDao returns dao implementation based on standard map.
 func NewInMemDao() *InMemDao {
 	return &InMemDao{make(map[string][]byte)}
 }

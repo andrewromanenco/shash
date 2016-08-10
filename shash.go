@@ -1,10 +1,27 @@
+/*
+Package shash contains a secured hash implementation. It works on top of a key-value
+storage with Dao interface. All values are encrypted by AES 256.
+
+Keys are not encrypted.
+
+Key is created based on provided password with crypto-rand salt.
+
+Example:
+
+    dao := shash.NewInMemDao()  // implement your own DAO if use a DB
+    sh, _ := shash.NewSecuredHash("password", dao)
+    sh.Put([]byte("key"), []byte("value")) // saved, with value encrypted
+    v, _ := sh.Get([]byte("key"))  // v is []byte("value")
+    sh.Delete([]byte("key"))  // key is deleted
+
+*/
 package shash
 
 import (
 	"errors"
 )
 
-// SHash is secured hash implentation under any key-value storage (see Dao
+// SHash is a secured hash implentation on top of any key-value storage (see Dao
 // interface).
 type SHash struct {
 	dao Dao
@@ -52,7 +69,8 @@ func (sh *SHash) Put(key, value []byte) error {
 	return sh.dao.Put(key, encrypted)
 }
 
-// Get return decrypted value for a key. Nil if no data exists.
+// Get returns decrypted value for a key. Nil if no data exists or the password
+// is wrong.
 func (sh *SHash) Get(key []byte) ([]byte, error) {
 	encrypted, err := sh.dao.Get(key)
 	if err != nil {
