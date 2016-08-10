@@ -60,6 +60,30 @@ func NewSecuredHash(password string, dao Dao) (*SHash, error) {
 	return &SHash{dao, key}, nil
 }
 
+// OpenSecuredHash creates secured hash on top of dao with salt already
+// initialized. Fails if no salt yet.
+func OpenSecuredHash(password string, dao Dao) (*SHash, error) {
+	if password == "" {
+		return nil, errors.New("No password is provided")
+	}
+	if dao == nil {
+		return nil, errors.New("No DAO is provided")
+	}
+	existingSalt, err := dao.Get([]byte(saltKey))
+	if err != nil {
+		return nil, err
+	}
+	if existingSalt == nil {
+		return nil, errors.New(
+			"No salt, use NewSecuredHash")
+	}
+	key, err := keyHashWithSalt(password, existingSalt)
+	if err != nil {
+		return nil, err
+	}
+	return &SHash{dao, key}, nil
+}
+
 // Put encrypts value and sends it to dao with the key.
 func (sh *SHash) Put(key, value []byte) error {
 	encrypted, err := encrypt(sh.key, value)

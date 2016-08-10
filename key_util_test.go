@@ -36,3 +36,28 @@ func TestHashingSamePwdReturnsDifferentKeyAndSalt(t *testing.T) {
 		t.Error("Same salt is returned")
 	}
 }
+
+func TestKeyWithSaltFailsIfWrongSalt(t *testing.T) {
+	badSalt := []byte("too-short")
+	_, err := keyHashWithSalt("qwerty", badSalt)
+	if err == nil {
+		t.Error("Must fail if salt has wrong size")
+	}
+}
+
+func TestKeyWithSaltFailsIfSaltNil(t *testing.T) {
+	_, err := keyHashWithSalt("qwerty", nil)
+	if err == nil {
+		t.Error("Must fail if salt has wrong size")
+	}
+}
+
+func TestKeyWithSaltReturnsSameKey(t *testing.T) {
+	password := "qwerty"
+	salt := []byte("12345678901234567890123456789012")
+	key1, _ := keyHashWithSalt(password, salt)
+	key2, _ := keyHashWithSalt(password, salt)
+	if !reflect.DeepEqual(key1, key2) {
+		t.Error("Keys must match for same password and salt")
+	}
+}

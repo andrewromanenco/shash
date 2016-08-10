@@ -50,6 +50,51 @@ func TestNewSHMustFailIfSaltAlreadyExists(t *testing.T) {
 	}
 }
 
+func TestOpenSHFailsIfPasswordEmpty(t *testing.T) {
+	dao := newMockDao()
+	dao.m["_salt_key_74469_"] = []byte("12345678901234567890123456789012")
+	_, err := OpenSecuredHash("", dao)
+	if err == nil {
+		t.Error("Must fail for empty password")
+	}
+}
+
+func TestOoenSHFailsIfDaoNotProvided(t *testing.T) {
+	_, err := OpenSecuredHash("password", nil)
+	if err == nil {
+		t.Error("Must fail when dao not provided")
+	}
+}
+
+func TestOpenSHWorks(t *testing.T) {
+	dao := newMockDao()
+	dao.m["_salt_key_74469_"] = []byte("12345678901234567890123456789012")
+	testee, err := OpenSecuredHash("password", dao)
+	if err != nil {
+		t.Error("No errors are expected")
+	}
+	if testee == nil {
+		t.Error("Valid shash must be created")
+	}
+}
+
+func TestOpenSHMustFailIfNoSaltExists(t *testing.T) {
+	dao := newMockDao()
+	_, err := OpenSecuredHash("password", dao)
+	if err == nil {
+		t.Error("Must fail when salt value does not exist")
+	}
+}
+
+func TestNewFollowedByOpen(t *testing.T) {
+	dao := newMockDao()
+	NewSecuredHash("password", dao)
+	_, err := OpenSecuredHash("password", dao)
+	if err != nil {
+		t.Error("Must not fail open after just new")
+	}
+}
+
 func initTestee() (*InMemDao, *SHash) {
 	dao := newMockDao()
 	testee, _ := NewSecuredHash("password", dao)
