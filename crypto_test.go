@@ -63,3 +63,21 @@ func TestDecryptFailsOnWrongPassword(t *testing.T) {
 		t.Error("Encryption must fail with wrong password")
 	}
 }
+
+func TestEncryptSameDataTwiceMustReturnNonEqualResults(t *testing.T) {
+	key := []byte("12345678901234567890123456789012")
+	data := []byte("test-data")
+	encrypted1, _ := encrypt(key, data)
+	encrypted2, _ := encrypt(key, data)
+	if reflect.DeepEqual(encrypted1, encrypted2) {
+		t.Error("Encrypted result should be different each time it produced")
+	}
+	decrypted, _ := decrypt(key, encrypted1)
+	if !reflect.DeepEqual(decrypted, data) {
+		t.Error("Decryption of #1 did not produce original data")
+	}
+	decrypted, _ = decrypt(key, encrypted2)
+	if !reflect.DeepEqual(decrypted, data) {
+		t.Error("Decryption of #2 did not produce original data")
+	}
+}
